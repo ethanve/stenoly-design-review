@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stenoly — screen concepts</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root { color-scheme:light; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:#222; background:#fff; }
+* { box-sizing:border-box; }
+body { margin:0; }
+main { max-width:1360px; margin:auto; padding:28px clamp(16px,4vw,48px) 40px; }
+h1 { margin:0 0 10px; font-size:clamp(24px,3vw,32px); font-weight:600; letter-spacing:-.03em; }
+p { color:#666; line-height:1.6; font-size:14px; margin:0; }
+nav { display:flex; flex-wrap:wrap; gap:7px; margin:24px 0; }
+button,a { font:inherit; -webkit-tap-highlight-color:transparent; }
+button,.link { min-height:44px; display:inline-flex; align-items:center; justify-content:center; padding:11px 14px; border:1px solid #d4d4d4; border-radius:7px; background:#fff; color:#222; text-decoration:none; font-size:13px; }
+button { cursor:pointer; }
+button:hover,.link:hover { background:#f2f2f2; }
+button[aria-current="step"] { background:#222; color:#fff; border-color:#222; }
+button:disabled { opacity:.35; cursor:default; }
+button:focus-visible,a:focus-visible,input:focus-visible { outline:3px solid #3169b5; outline-offset:3px; }
+.toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+h2 { margin:0; font-size:18px; font-weight:600; }
+.actions { display:flex; flex-wrap:wrap; gap:7px; }
+.caption { margin-bottom:16px; }
+.stage { max-width:800px; margin:auto; }
+.crop { position:relative; width:100%; aspect-ratio:3/4; overflow:hidden; background:#f5f5f5; }
+.crop img { position:absolute; top:0; width:200%; max-width:none; height:auto; display:block; }
+.crop.left img { left:0; }
+.crop.right img { left:-100%; }
+.image-button { display:block; width:100%; border:1px solid #ddd; border-radius:8px; overflow:hidden; padding:0; cursor:zoom-in; background:#f5f5f5; }
+.placeholder { min-height:480px; display:flex; align-items:center; justify-content:center; text-align:center; padding:30px; border:1px solid #ddd; border-radius:8px; color:#666; }
+.status { font-size:12px; color:#777; margin:10px 0 18px; text-align:center; min-height:20px; }
+.pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; max-width:800px; margin:auto; }
+.pagination span { font-size:13px; color:#666; }
+dialog { width:100vw; max-width:100vw; height:100dvh; max-height:100dvh; border:0; margin:0; padding:0; background:#242424; color:#fff; }
+dialog::backdrop { background:#242424; }
+.viewer { height:100%; display:flex; flex-direction:column; }
+.viewerbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; padding:12px 16px; background:#171717; flex-shrink:0; }
+.viewerbar strong { font-size:14px; }
+.viewerbar label { display:flex; align-items:center; gap:8px; font-size:13px; }
+.viewerbar input { width:clamp(100px,22vw,180px); min-height:44px; }
+.viewerbar output { min-width:38px; font-variant-numeric:tabular-nums; }
+.viewerbar button { min-height:44px; padding:9px 12px; color:white; background:#303030; border-color:#666; }
+.viewerbar .close { margin-left:auto; }
+.canvas { flex:1; min-height:0; overflow:auto; padding:20px; }
+.canvas .crop { margin:auto; max-width:none; flex-shrink:0; }
+.downloads { max-width:800px; margin:36px auto 0; padding-top:22px; border-top:1px solid #e3e3e3; } .downloads h2 { margin-bottom:8px; } .downloads a { display:block; padding:12px 0; color:#333; min-height:44px; }
+.hint { padding:7px 16px; font-size:12px; color:#bbb; background:#171717; }
+[hidden] { display:none !important; }
+@media(max-width:600px) { nav { display:grid; grid-template-columns:1fr 1fr; } nav button { text-align:left; justify-content:flex-start; font-size:14px; } .actions { width:100%; } .actions > * { flex:1 1 auto; } main { padding-top:22px; } .placeholder { min-height:340px; } .canvas { padding:8px; } .viewerbar .close { margin-left:0; } }
+</style>
+</head>
+<body>
+<main>
+<h1>Stenoly — screen concepts</h1>
+<p>Proposed screens for review. These images show the flow; the pictured form controls are not interactive.</p>
+<nav aria-label="Walkthrough steps">
+<button type="button" data-step="0" aria-current="step">1 · Request</button>
+<button type="button" data-step="1">2 · Review</button>
+<button type="button" data-step="2">3 · Handoff</button>
+<button type="button" data-step="3">4 · Participant availability</button>
+<button type="button" data-step="4">5 · Choose a time</button>
+<button type="button" data-step="5">6 · Confirmed</button>
+</nav>
+<div class="toolbar">
+<h2 id="stepLabel">Request</h2>
+<div class="actions">
+<button type="button" id="expand" disabled>Enlarge &amp; zoom</button>
+<a class="link" id="openImage" href="assets/request-and-handoff.png" target="_blank" rel="noopener" hidden>Open full image ↗</a>
+<a class="link" id="downloadImage" href="assets/request-and-handoff.png" download="request-and-handoff.png" hidden>Download full image</a>
+</div>
+</div>
+<p class="caption" id="caption">Start a request using saved details.</p>
+<div class="stage">
+<div class="placeholder" id="placeholder">Loading screen…</div>
+<button class="image-button" id="imageButton" type="button" aria-label="Enlarge Request screen" hidden><div class="crop left" id="screenCrop"><img id="screenImage" alt="Request screen concept"></div></button>
+</div>
+<div class="status" id="status" role="status">Loading screen…</div>
+<div class="pagination" aria-label="Step navigation">
+<button type="button" id="previous" disabled>← Previous</button>
+<span id="position">1 of 6</span>
+<button type="button" id="next">Next →</button>
+</div>
+<section class="downloads" aria-labelledby="downloadHeading">
+<h2 id="downloadHeading">Share the images</h2>
+<p>Download the three full images to send separately. Each contains two screens.</p>
+<a href="assets/request-and-handoff.png" download="request-and-handoff.png">Request &amp; handoff · PNG</a>
+<a href="assets/review-and-availability.png" download="review-and-availability.png">Review &amp; participant availability · PNG</a>
+<a href="assets/time-and-confirmation.png" download="time-and-confirmation.png">Choose a time &amp; confirmed · PNG</a>
+</section>
+</main>
+<dialog id="viewer" aria-label="Enlarged screen concept">
+<div class="viewer">
+<div class="viewerbar">
+<strong id="viewerLabel">Request</strong>
+<label>Zoom <input id="zoom" aria-label="Screen zoom" type="range" min="50" max="300" value="100" step="10"><output id="zoomValue">100%</output></label>
+<button type="button" id="reset">Reset to fit</button>
+<button type="button" id="close" class="close">Close · Esc</button>
+</div>
+<div class="canvas" id="canvas"><div class="crop left" id="largeCrop"><img id="largeImage" alt=""></div></div>
+<div class="hint">Use the slider to zoom, then scroll to inspect the screen. Press Escape to close.</div>
+</div>
+</dialog>
+<script>
+(function () {
+  "use strict";
+  const byId = id => document.getElementById(id);
+  const boards = {a:"assets/request-and-handoff.png", b:"assets/review-and-availability.png", c:"assets/time-and-confirmation.png"};
+  const steps = [
+    {label:"Request", path:boards.a, side:"left", caption:"Start a request using saved details."},
+    {label:"Review", path:boards.b, side:"left", caption:"Check the request before coordination begins."},
+    {label:"Handoff", path:boards.a, side:"right", caption:"See that coordination is underway and what happens next."},
+    {label:"Participant availability", path:boards.b, side:"right", caption:"Participant view: share availability through a private link, separate from the firm workspace."},
+    {label:"Choose a time", path:boards.c, side:"left", caption:"Review the proposed appointment and choose a time."},
+    {label:"Confirmed", path:boards.c, side:"right", caption:"See the confirmed appointment and its details."}
+  ];
+  const viewer=byId("viewer"), image=byId("screenImage"), large=byId("largeImage");
+  let index=0, ticket=0, retryTimer=null, ready=false, halfRatio=.75, fitWidth=700;
+  function available(value) {
+    ready=value;
+    byId("expand").disabled=!value;
+    byId("imageButton").hidden=!value;
+    byId("placeholder").hidden=value;
+    byId("openImage").hidden=!value;
+    byId("downloadImage").hidden=!value;
+  }
+  function show(retry) {
+    clearTimeout(retryTimer);
+    const token=++ticket, step=steps[index];
+    document.querySelectorAll("[data-step]").forEach(button => {
+      if(Number(button.dataset.step)===index) button.setAttribute("aria-current","step");
+      else button.removeAttribute("aria-current");
+    });
+    byId("stepLabel").textContent=step.label;
+    byId("caption").textContent=step.caption;
+    byId("position").textContent=(index+1)+" of "+steps.length;
+    byId("previous").disabled=index===0;
+    byId("next").disabled=index===steps.length-1;
+    available(false);
+    if(!retry) {
+      byId("placeholder").textContent="Loading screen…";
+      byId("status").textContent="Loading screen…";
+    }
+    const probe=new Image();
+    probe.onload=function() {
+      if(token!==ticket) return;
+      halfRatio=(probe.naturalWidth/2)/probe.naturalHeight;
+      byId("screenCrop").className="crop "+step.side;
+      byId("screenCrop").style.aspectRatio=String(halfRatio);
+      image.src=step.path;
+      image.alt=step.label+": image-generated Stenoly screen concept";
+      byId("imageButton").setAttribute("aria-label","Enlarge "+step.label+" screen");
+      byId("openImage").href=step.path;
+      byId("downloadImage").href=step.path;
+      byId("downloadImage").download=step.path.split("/").pop();
+      available(true);
+      byId("status").textContent="Click the screen to enlarge it. The full image includes two screen concepts.";
+    };
+    probe.onerror=function() {
+      if(token!==ticket) return;
+      byId("placeholder").textContent="Screen is being prepared";
+      byId("status").textContent="This view checks automatically while the image is being prepared.";
+      retryTimer=setTimeout(()=>show(true),5000);
+    };
+    probe.src=step.path;
+  }
+  function move(target) {
+    index=Math.max(0,Math.min(steps.length-1,target));
+    show(false);
+  }
+  document.querySelectorAll("[data-step]").forEach(button=>button.addEventListener("click",()=>move(Number(button.dataset.step))));
+  byId("previous").addEventListener("click",()=>move(index-1));
+  byId("next").addEventListener("click",()=>move(index+1));
+  function zoomTo(value) {
+    byId("zoom").value=value;
+    byId("zoomValue").value=value+"%";
+    byId("largeCrop").style.width=Math.round(fitWidth*value/100)+"px";
+  }
+  function reset() {
+    const canvas=byId("canvas");
+    const padding=parseFloat(getComputedStyle(canvas).paddingLeft)*2;
+    fitWidth=Math.max(1,Math.min(canvas.clientWidth-padding,(canvas.clientHeight-padding)*halfRatio));
+    zoomTo(100);
+    canvas.scrollTo(0,0);
+  }
+  function expand() {
+    if(!ready) return;
+    const step=steps[index];
+    byId("largeCrop").className="crop "+step.side;
+    byId("largeCrop").style.aspectRatio=String(halfRatio);
+    large.onload=reset;
+    large.src=step.path;
+    large.alt=image.alt;
+    byId("viewerLabel").textContent=step.label;
+    viewer.showModal();
+    reset();
+    byId("close").focus();
+  }
+  byId("expand").addEventListener("click",expand);
+  byId("imageButton").addEventListener("click",expand);
+  byId("close").addEventListener("click",()=>viewer.close());
+  byId("reset").addEventListener("click",reset);
+  byId("zoom").addEventListener("input",event=>zoomTo(Number(event.target.value)));
+  window.addEventListener("resize",()=>{if(viewer.open) reset();});
+  show(false);
+})();
+</script>
+</body>
+</html>
